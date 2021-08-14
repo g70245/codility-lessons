@@ -25,7 +25,7 @@ func Solution(H []int) int {
         last := len(stack) - 1
         if h > stack[last] {
             stack = append(stack, h)
-        }else if h < stack[last] {
+        } else if h < stack[last] {
             for last >= 0 && h < stack[last] {
                 stack = stack[:last]
                 ans++
