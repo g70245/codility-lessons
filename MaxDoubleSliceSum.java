@@ -13,7 +13,7 @@ class Solution {
         }
 
         /*  
-            While a new integer, denoted as "a", enters to the double slices, 
+            When a new integer, denoted as "a", enters to the double slices, 
             the maximal sum of the double slices will be the maximum of these values:
             1. p + q + a
             2. p + q + m
