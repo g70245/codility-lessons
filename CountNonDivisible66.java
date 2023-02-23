@@ -19,15 +19,19 @@ class Solution {
         Map<Integer, Property> properties = new HashMap<>();
         int[] nonDivisors = new int[N];
         for (int i = 0; i < N; i++) {
-            nonDivisors[i] = N - getDivisorCount(sieve, counters, A[i], properties);
+            nonDivisors[i] = N - getDivisorCount(sieve, counters, A[i], properties).divisorCount;
             // System.out.println(properties.get(A[i]));
         }
 
         return nonDivisors;
     }
 
-    private int getDivisorCount(int[] sieve, Map<Integer, Integer> counters, int num, Map<Integer, Property> properties) {
-        Property proterty = new Property();
+    private Property getDivisorCount(int[] sieve, Map<Integer, Integer> counters, int num, Map<Integer, Property> properties) {
+        Property proterty = properties.getOrDefault(num, new Property());
+        if (!proterty.isNew()) {
+            return proterty;
+        }
+
         if (sieve[num] == 0) {
             proterty.factors.add(num);
             proterty.factors.add(1);
@@ -35,15 +39,14 @@ class Solution {
                 proterty.divisorCount += counters.getOrDefault(factor, 0);
             }
             properties.put(num, proterty);
-            return proterty.divisorCount;
+            return proterty;
         } else {
             int decompositeNum = num / sieve[num];
-            getDivisorCount(sieve, counters, decompositeNum, properties);
-            Property decompositeNumProperty = properties.get(decompositeNum);
+            Property decompositeNumProperty = properties.getOrDefault(decompositeNum, getDivisorCount(sieve, counters, decompositeNum, properties));
 
             proterty.factors.addAll(decompositeNumProperty.factors);
             proterty.divisorCount = decompositeNumProperty.divisorCount;
-            for (int factor: properties.get(decompositeNum).factors) {
+            for (int factor: decompositeNumProperty.factors) {
                 int newFactor = factor * sieve[num];
                 if (!proterty.factors.contains(newFactor)) {
                     proterty.factors.add(newFactor);
@@ -51,7 +54,7 @@ class Solution {
                 }
             }
             properties.put(num, proterty);
-            return proterty.divisorCount;
+            return proterty;
         }
     }
 
@@ -79,6 +82,10 @@ class Solution {
 
         public String toString() {
             return String.format("divisorCount:%d  divisors:%s",divisorCount, factors);
+        }
+
+        public boolean isNew() {
+            return factors.size() == 0 ? true: false;
         }
     }
 }
