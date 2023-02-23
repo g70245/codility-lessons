@@ -17,9 +17,13 @@ class Solution {
         }
 
         Map<Integer, Property> properties = new HashMap<>();
+        for (int num: counters.keySet()) {
+            getDivisorCount(sieve, counters, num, properties);
+        }
+
         int[] nonDivisors = new int[N];
         for (int i = 0; i < N; i++) {
-            nonDivisors[i] = N - getDivisorCount(sieve, counters, A[i], properties).divisorCount;
+            nonDivisors[i] = N - properties.get(A[i]).divisorCount;
             // System.out.println(properties.get(A[i]));
         }
 
@@ -39,6 +43,7 @@ class Solution {
                 proterty.divisorCount += counters.getOrDefault(factor, 0);
             }
             properties.put(num, proterty);
+            // System.out.println(num + ", " + proterty);
             return proterty;
         } else {
             int decompositeNum = num / sieve[num];
@@ -54,6 +59,7 @@ class Solution {
                 }
             }
             properties.put(num, proterty);
+            // System.out.println(num + ", " + proterty);
             return proterty;
         }
     }
