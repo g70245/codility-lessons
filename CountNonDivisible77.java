@@ -5,16 +5,15 @@ import java.util.*;
 // System.out.println("this is a debug message");
 
 class Solution {
+
+    private int N;
+
     public int[] solution(int[] A) {
         // Implement your solution here
-        int N = A.length;
+        N = A.length;
         int[] sieve = createSieve(N * 2);
-        
 
-        Map<Integer, Integer> counters = new HashMap<>();
-        for (int i = 0; i < N; i++) {
-            counters.put(A[i], counters.getOrDefault(A[i], 0) + 1);
-        }
+        Map<Integer, Integer> counters = countElements(A);
 
         Map<Integer, Property> properties = new HashMap<>();
         for (int num: counters.keySet()) {
@@ -23,44 +22,44 @@ class Solution {
 
         int[] nonDivisors = new int[N];
         for (int i = 0; i < N; i++) {
-            nonDivisors[i] = N - properties.get(A[i]).divisorCount;
-            // System.out.println(properties.get(A[i]));
+            nonDivisors[i] = properties.get(A[i]).getNonDivisorCount();
         }
 
         return nonDivisors;
     }
 
-    private Property getDivisorCount(int[] sieve, Map<Integer, Integer> counters, int num, Map<Integer, Property> properties) {
-        Property proterty = properties.getOrDefault(num, new Property());
-        if (!proterty.isNew()) {
-            return proterty;
+    private void getDivisorCount(int[] sieve, Map<Integer, Integer> counters, int num, Map<Integer, Property> properties) {
+        if (properties.containsKey(num)) {
+            return;
         }
 
         if (sieve[num] == 0) {
-            proterty.factors.add(num);
-            proterty.factors.add(1);
-            for (int factor: proterty.factors) {
-                proterty.divisorCount += counters.getOrDefault(factor, 0);
+            Set<Integer> factors = new HashSet<>();
+            factors.add(num);
+            factors.add(1);
+
+            int divisorCount = 0;
+            for (int factor: factors) {
+                divisorCount += counters.getOrDefault(factor, 0);
             }
-            properties.put(num, proterty);
-            // System.out.println(num + ", " + proterty);
-            return proterty;
+            properties.put(num, new Property(factors, divisorCount));
         } else {
             int decompositeNum = num / sieve[num];
-            Property decompositeNumProperty = properties.getOrDefault(decompositeNum, getDivisorCount(sieve, counters, decompositeNum, properties));
-
-            proterty.factors.addAll(decompositeNumProperty.factors);
-            proterty.divisorCount = decompositeNumProperty.divisorCount;
+            if (!properties.containsKey(decompositeNum)) {
+                getDivisorCount(sieve, counters, decompositeNum, properties);
+            }
+            Property decompositeNumProperty = properties.get(decompositeNum);
+            Set<Integer> factors = new HashSet<>();    
+            factors.addAll(decompositeNumProperty.factors);
+            int divisorCount = decompositeNumProperty.divisorCount;
             for (int factor: decompositeNumProperty.factors) {
                 int newFactor = factor * sieve[num];
-                if (!proterty.factors.contains(newFactor)) {
-                    proterty.factors.add(newFactor);
-                    proterty.divisorCount += counters.getOrDefault(newFactor, 0);
+                if (!factors.contains(newFactor)) {
+                    factors.add(newFactor);
+                    divisorCount += counters.getOrDefault(newFactor, 0);
                 }
             }
-            properties.put(num, proterty);
-            // System.out.println(num + ", " + proterty);
-            return proterty;
+            properties.put(num, new Property(factors, divisorCount));
         }
     }
 
@@ -82,16 +81,31 @@ class Solution {
         return sieve;
     }
 
+    private Map<Integer, Integer> countElements(int[] A) {
+        Map<Integer, Integer> counters = new HashMap<>();
+        for (int i = 0; i < N; i++) {
+            counters.merge(A[i], 1, (oldValue, newValue) -> oldValue + 1);
+        }
+        return counters;
+    }
+
     class Property {
-        Set<Integer> factors = new HashSet<>();
-        int divisorCount = 0;
+        private Set<Integer> factors = new HashSet<>();
+        private int divisorCount;
+        private int nonDivisorCount;
+
+        public Property(Set<Integer> factors, int divisorCount) {
+            this.factors = factors;
+            this.divisorCount = divisorCount;
+            this.nonDivisorCount = N - divisorCount;
+        }
 
         public String toString() {
             return String.format("divisorCount:%d  divisors:%s",divisorCount, factors);
         }
 
-        public boolean isNew() {
-            return factors.size() == 0 ? true: false;
+        public int getNonDivisorCount() {
+            return this.nonDivisorCount;
         }
     }
 }
