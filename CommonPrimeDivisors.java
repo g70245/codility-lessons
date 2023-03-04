@@ -11,7 +11,7 @@ class Solution {
         int ans = 0;
         for (int i = 0; i < Z; i++) {
             int gcd = A[i] >= B[i] ? gcd(A[i], B[i]) : gcd(B[i], A[i]);
-            if (checkIfHavingSamePrimeDivisors(gcd, A[i]) && checkIfHavingSamePrimeDivisors(gcd, B[i])) {
+            if (A[i] == B[i] || (checkIfHavingSamePrimeDivisors(gcd, A[i]) && checkIfHavingSamePrimeDivisors(gcd, B[i]))) {
                 ans++;
             }
         }
