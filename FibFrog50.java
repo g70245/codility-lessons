@@ -15,33 +15,42 @@ class Solution {
 
     public int solution(int[] A) {
         // Implement your solution here
-        int N = A.length;
-        int width = N + 1;
-        if (fibs.contains(width)) {
-            return 1;
+        List<Integer> landingPlace = getLandingPlace(A);
+        int[] dp = new int[landingPlace.size()];
+        int NO_FIB_JUMPS_VALUE = Integer.MAX_VALUE;
+        for (int i = 1; i < dp.length; i++) {
+            dp[i] = fibs.contains(landingPlace.get(i)) ? 1 : NO_FIB_JUMPS_VALUE;
         }
-
-        Map<Integer, Integer> dp = new HashMap<>();
-        for (int i = 1; i <= width; i++) {
-            if (i == width || A[i - 1] == 1) {
-                if (fibs.contains(i)) {
-                    dp.put(i, 1);
+        
+        for (int i = 1 ; i < dp.length - 1; i++) {
+            for (int j = i + 1; j < dp.length; j++) {
+                int leftPart = dp[i];
+                if (leftPart == NO_FIB_JUMPS_VALUE) {
+                    continue;
+                }
+                
+                int rightPart = fibs.contains(landingPlace.get(j) - landingPlace.get(i)) ? 1 : NO_FIB_JUMPS_VALUE;
+                if (rightPart == NO_FIB_JUMPS_VALUE) {
                     continue;
                 }
 
-                int min = Integer.MAX_VALUE;
-                for (Map.Entry<Integer, Integer> e : dp.entrySet()) {
-                    if (fibs.contains(i - e.getKey())) {
-                        min = Math.min(min, e.getValue());
-                    }
-                }
-
-                if (min != Integer.MAX_VALUE) {
-                    dp.put(i, min + 1);
-                }
+                dp[j] = Math.min(dp[j], leftPart + rightPart);
             }
         }
-        return dp.containsKey(width) ? dp.get(width) : -1;
+
+        return dp[dp.length - 1] == NO_FIB_JUMPS_VALUE ? -1 : dp[dp.length - 1];
+    }
+
+    private List<Integer> getLandingPlace(int[] A) {
+        List<Integer> landingPlace = new ArrayList<>();
+        landingPlace.add(0);
+        for (int i = 0; i < A.length; i++) {
+            if (A[i] == 1) {
+                landingPlace.add(i + 1);
+            }
+        }
+        landingPlace.add(A.length + 1);
+        return landingPlace;
     }
 
     private Set<Integer> generateFibs(int limit) {
