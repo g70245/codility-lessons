@@ -38,7 +38,10 @@ class Solution {
                     if (nextDest == 0) {
                         ans = new ArrayList<>(route);
                         ans.add(fibs.get(i));
-                    } else if (A[nextDest - 1] == 1) {
+                        break;
+                    }
+                    
+                    if (A[nextDest - 1] == 1) {
                         List<Integer> newRoute = new ArrayList<>(route);
                         newRoute.set(0, nextDest);
                         newRoute.add(fibs.get(i));
