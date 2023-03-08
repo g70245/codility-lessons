@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 
 class Solution {
 
-    private static final int CAN_NOT_REACH_VALUE = Integer.MAX_VALUE;
-
     public int solution(int[] A) {
         // Implement your solution here
         int dest = A.length + 1;
@@ -27,17 +25,24 @@ class Solution {
         }
 
         while (routes.size() > 0) {
+            // System.out.println(routes);
             List<List<Integer>> nextProgress = new ArrayList<>();
             for (List<Integer> route : routes) {
                 if (ans.size() != 0 && route.size() + 1 >= ans.size()) {
                     continue;
                 }
 
+                List<List<Integer>> plotting = new ArrayList<>();
                 for (int i = 0; i < fibs.size() && fibs.get(i) <= route.get(0); i++) {
+                    if (fibs.contains(route.get(route.size() - 1) + fibs.get(i))) {
+                        continue;
+                    }
+
                     int nextDest = route.get(0) - fibs.get(i);
                     if (nextDest == 0) {
                         ans = new ArrayList<>(route);
                         ans.add(fibs.get(i));
+                        plotting.clear();
                         break;
                     }
                     
@@ -45,9 +50,10 @@ class Solution {
                         List<Integer> newRoute = new ArrayList<>(route);
                         newRoute.set(0, nextDest);
                         newRoute.add(fibs.get(i));
-                        nextProgress.add(newRoute);
+                        plotting.add(newRoute);
                     }
                 }
+                nextProgress.addAll(plotting);
             }
             routes = nextProgress;
         }
