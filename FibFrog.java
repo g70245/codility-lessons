@@ -15,11 +15,12 @@ class Solution {
             return 1;
         }
 
+        Set<Integer> hasDiscovered = new HashSet<>();
         List<List<Integer>> routes = new ArrayList<>();
         routes.add(Arrays.asList(dest));
 
         while (routes.size() > 0) {
-            System.out.print(routes.size() + " ");
+            // System.out.print(routes.size() + " ");
             List<List<Integer>> nextProgress = new ArrayList<>();
             for (List<Integer> route : routes) {
                 if (fibs.contains(route.get(0))) {
@@ -31,12 +32,12 @@ class Solution {
                 while (fibs.get(--end) > route.get(0)) { }
 
                 while (start < end) {
-                    plotNewRoute(A, route, fibs.get(start++), nextProgress);
-                    plotNewRoute(A, route, fibs.get(end--), nextProgress);
+                    plotNewRoute(A, route, fibs.get(start++), nextProgress, hasDiscovered);
+                    plotNewRoute(A, route, fibs.get(end--), nextProgress, hasDiscovered);
                 }
 
                 if (start == end) {
-                    plotNewRoute(A, route, fibs.get(start), nextProgress);
+                    plotNewRoute(A, route, fibs.get(start), nextProgress, hasDiscovered);
                 }
             }
             routes = nextProgress;
@@ -45,12 +46,13 @@ class Solution {
         return -1;
     }
 
-    private void plotNewRoute(int[] A, List<Integer> route, int fib, List<List<Integer>> nextProgress) {
-        if (A[route.get(0) - fib - 1] == 1) {
+    private void plotNewRoute(int[] A, List<Integer> route, int fib, List<List<Integer>> nextProgress, Set<Integer> hasDiscovered) {
+        if (A[route.get(0) - fib - 1] == 1 && !hasDiscovered.contains(route.get(0) - fib)) {
             List<Integer> newRoute = new ArrayList<>(route);
             newRoute.set(0, route.get(0) - fib);
             newRoute.add(fib);
             nextProgress.add(newRoute);
+            hasDiscovered.add(newRoute.get(0));
         }
     }
 
