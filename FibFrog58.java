@@ -16,49 +16,42 @@ class Solution {
         }
 
         List<List<Integer>> routes = new ArrayList<>();
-        List<Integer> ans = new ArrayList<>();
-        for (int i = 0; i < fibs.size() && fibs.get(i) < dest; i++) {
-            int nextDest = dest - fibs.get(i);            
-            if (A[nextDest - 1] == 1) {
-                routes.add(Arrays.asList(nextDest, fibs.get(i)));
-            }
-        }
+        routes.add(Arrays.asList(dest));
 
         while (routes.size() > 0) {
-            // System.out.println(routes);
+            System.out.print(routes.size() + " ");
             List<List<Integer>> nextProgress = new ArrayList<>();
             for (List<Integer> route : routes) {
-                if (ans.size() != 0 && route.size() + 1 >= ans.size()) {
-                    continue;
+                if (fibs.contains(route.get(0))) {
+                    return route.size();
                 }
 
-                List<List<Integer>> plotting = new ArrayList<>();
-                for (int i = 0; i < fibs.size() && fibs.get(i) <= route.get(0); i++) {
-                    if (fibs.contains(route.get(route.size() - 1) + fibs.get(i))) {
-                        continue;
-                    }
+                int start = 0;
+                int end = fibs.size() - 1;
+                while (fibs.get(--end) > route.get(0)) { }
 
-                    int nextDest = route.get(0) - fibs.get(i);
-                    if (nextDest == 0) {
-                        ans = new ArrayList<>(route);
-                        ans.add(fibs.get(i));
-                        plotting.clear();
-                        break;
-                    }
-                    
-                    if (A[nextDest - 1] == 1) {
-                        List<Integer> newRoute = new ArrayList<>(route);
-                        newRoute.set(0, nextDest);
-                        newRoute.add(fibs.get(i));
-                        plotting.add(newRoute);
-                    }
+                while (start < end) {
+                    plotNewRoute(A, route, fibs.get(start++), nextProgress);
+                    plotNewRoute(A, route, fibs.get(end--), nextProgress);
                 }
-                nextProgress.addAll(plotting);
+
+                if (start == end) {
+                    plotNewRoute(A, route, fibs.get(start), nextProgress);
+                }
             }
             routes = nextProgress;
         }
 
-        return ans.size() - 1;
+        return -1;
+    }
+
+    private void plotNewRoute(int[] A, List<Integer> route, int fib, List<List<Integer>> nextProgress) {
+        if (A[route.get(0) - fib - 1] == 1) {
+            List<Integer> newRoute = new ArrayList<>(route);
+            newRoute.set(0, route.get(0) - fib);
+            newRoute.add(fib);
+            nextProgress.add(newRoute);
+        }
     }
 
     private List<Integer> prepareFibs(int limit) {
