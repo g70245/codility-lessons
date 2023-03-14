@@ -37,8 +37,7 @@ class Solution {
             int a = A[i];
 
             maxEnding = Math.max(0, maxEnding + Math.max(a, Math.max(m, - p)));
-            // maxEnding + a <= q → maxEnding + a <= maxEnding - p → a <= -p
-            if (a < m || a + p <= 0 || maxEnding <= 0) {
+            if (a < m || a <= -p || maxEnding == 0) {
                 p = maxEnding;
                 m = a;
             }
